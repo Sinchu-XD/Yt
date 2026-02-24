@@ -7,6 +7,7 @@ def get_web_stream(url: str):
         "yt-dlp",
         "--cookies", COOKIE_PATH,
         "--js-runtimes", "node",
+        "--remote-components", "ejs:github",
         "-f", "(bestaudio)[protocol^=http]/best",
         "--no-playlist",
         "-g",
