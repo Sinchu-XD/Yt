@@ -1,5 +1,4 @@
 import subprocess
-import os
 
 COOKIE_PATH = "/app/cookies.txt"
 
@@ -7,34 +6,25 @@ def get_web_stream(url: str):
     cmd = [
         "yt-dlp",
         "--cookies", COOKIE_PATH,
-        "--no-playlist",
-        "--quiet",
-        "--no-warnings",
         "--js-runtimes", "node",
-        "-f", "bestaudio[ext=m4a]/bestaudio/best",
+        "-f", "(bestaudio)[protocol^=http]/best",
+        "--no-playlist",
         "-g",
         url
     ]
 
-    try:
-        result = subprocess.run(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            timeout=25
-        )
+    result = subprocess.run(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
 
-        if result.returncode != 0:
-            print(result.stderr)
-            return None
-
-        return result.stdout.strip().split("\n")[0]
-
-    except Exception as e:
-        print(e)
+    if result.returncode != 0:
+        print(result.stderr)
         return None
 
+    return result.stdout.strip().split("\n")[0]
 
 async def ytdl_audio(url: str):
     stream_url = get_web_stream(url)
