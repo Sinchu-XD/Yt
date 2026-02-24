@@ -6,7 +6,7 @@ def get_web_stream(url: str):
         "--cookies", "cookies.txt",
         "--js-runtimes", "node",
         "--remote-components", "ejs:github",
-        "-f", "(bestaudio)[protocol^=http]/best",
+        "-f", "bestvideo+bestaudio/best",
         "--no-playlist",
         "-g",
         url
