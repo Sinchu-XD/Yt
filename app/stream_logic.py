@@ -1,10 +1,45 @@
-from YouTubeMusic.Stream import get_stream
+import subprocess
+import os
+
+COOKIE_PATH = "/app/cookies.txt"
+
+def get_web_stream(url: str):
+    cmd = [
+        "yt-dlp",
+        "--cookies", COOKIE_PATH,
+        "--no-playlist",
+        "--quiet",
+        "--no-warnings",
+        "--js-runtimes", "node",
+        "-f", "bestaudio[ext=m4a]/bestaudio/best",
+        "-g",
+        url
+    ]
+
+    try:
+        result = subprocess.run(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            timeout=25
+        )
+
+        if result.returncode != 0:
+            print(result.stderr)
+            return None
+
+        return result.stdout.strip().split("\n")[0]
+
+    except Exception as e:
+        print(e)
+        return None
+
 
 async def ytdl_audio(url: str):
-    try:
-        stream_url = get_stream(url, "/app/cookies.txt")
-        if not stream_url:
-            return False, "Failed to get audio stream URL"
-        return True, stream_url
-    except Exception as e:
-        return False, str(e)
+    stream_url = get_web_stream(url)
+
+    if not stream_url:
+        return False, "Failed to get audio stream URL"
+
+    return True, stream_url
