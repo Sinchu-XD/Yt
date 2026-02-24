@@ -1,12 +1,13 @@
 import subprocess
+from fastapi.responses import StreamingResponse
 
-def get_web_stream(url: str):
+def get_video_audio_urls(url: str):
     cmd = [
         "yt-dlp",
         "--cookies", "cookies.txt",
         "--js-runtimes", "node",
         "--remote-components", "ejs:github",
-        "-f", "bestvideo+bestaudio/best",
+        "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]",
         "--no-playlist",
         "-g",
         url
@@ -20,16 +21,36 @@ def get_web_stream(url: str):
     )
 
     if result.returncode != 0:
-        print("ERROR:", result.stderr)
-        return None
+        print(result.stderr)
+        return None, None
 
-    return result.stdout.strip().split("\n")[0]
+    urls = result.stdout.strip().split("\n")
+
+    if len(urls) < 2:
+        return None, None
+
+    return urls[0], urls[1]
 
 
-async def ytdl_audio(url: str):
-    stream_url = get_web_stream(url)
+def stream_merged(video_url: str, audio_url: str):
+    ffmpeg_cmd = [
+        "ffmpeg",
+        "-i", video_url,
+        "-i", audio_url,
+        "-c:v", "copy",
+        "-c:a", "copy",
+        "-f", "mp4",
+        "-movflags", "frag_keyframe+empty_moov",
+        "pipe:1"
+    ]
 
-    if not stream_url:
-        return False, "Failed to get audio stream URL"
+    process = subprocess.Popen(
+        ffmpeg_cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL
+    )
 
-    return True, stream_url
+    return StreamingResponse(
+        process.stdout,
+        media_type="video/mp4"
+    )
