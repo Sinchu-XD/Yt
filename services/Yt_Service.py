@@ -13,7 +13,7 @@ async def search_youtube(query: str):
     results = []
     for result in data["main_results"]:
         results.append({
-            "video_id": result["url"].split("v=")[-1],
+            "video_id": result["url"],
             "title": result["title"],
             "channel": result["channel"],
             "duration": result["duration"],
