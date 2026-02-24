@@ -25,6 +25,5 @@ async def search_youtube(query: str):
     return results
 
 
-def get_stream_urls(video_id: str):
-    link = f"https://youtube.com/watch?v={video_id}"
-    return get_video_audio_urls(link)
+def get_stream_urls(url: str):
+    return get_video_audio_urls(url)
