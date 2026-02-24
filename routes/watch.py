@@ -1,14 +1,14 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from services.Yt_Service import get_stream_urls
 from YouTubeMusic.Video_Stream import start_ffmpeg_merge
 
 router = APIRouter()
 
-@router.get("/{video_id}")
-async def watch(video_id: str):
+@router.get("/")
+async def watch(url: str = Query(...)):
 
-    video_url, audio_url = get_stream_urls(video_id)
+    video_url, audio_url = get_stream_urls(url)
 
     if not video_url:
         raise HTTPException(404, "Stream not found")
