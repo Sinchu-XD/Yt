@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Abhi Music Dashboard</title>
+    <style>
+        body {
+            background: #0f0f0f;
+            color: white;
+            font-family: Arial;
+            text-align: center;
+        }
+        input {
+            padding: 10px;
+            width: 300px;
+        }
+        button {
+            padding: 10px;
+            background: #ff0000;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+        video {
+            margin-top: 20px;
+            width: 60%;
+        }
+    </style>
+</head>
+<body>
+
+<h2>🎵 Abhi Music Web</h2>
+
+<input type="text" id="query" placeholder="Search Song">
+<button onclick="searchSong()">Search</button>
+
+<div id="result"></div>
+
+<video id="player" controls></video>
+
+<script>
+async function searchSong() {
+    let q = document.getElementById("query").value;
+    let res = await fetch(`/search?q=${q}`);
+    let data = await res.json();
+
+    if (!data.result || data.result.length === 0) {
+        alert("No Result");
+        return;
+    }
+
+    let song = data.result[0];
+
+    document.getElementById("result").innerHTML =
+        `<p>${song.title} (${song.duration})</p>
+         <button onclick="playStream('${data.url}')">▶ Play</button>`;
+}
+
+async function playStream(url) {
+    let res = await fetch(`/stream?url=${url}`);
+    let data = await res.json();
+
+    if (!data.success) {
+        alert("Stream Error");
+        return;
+    }
+
+    let player = document.getElementById("player");
+    player.src = data.stream;
+    player.play();
+}
+</script>
+
+</body>
+</html>
