@@ -3,7 +3,9 @@ uvicorn
 jinja2
 pymongo
 YouTubeMusic
-yt-dlp
 httpx
 orjson
 redis
+python-dotenv
+bcrypt
+pyjwt
